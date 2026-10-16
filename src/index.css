@@ -1,0 +1,479 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+/* ====================================================================
+   DESIGN TOKENS — Civil DAMP campus fieldbook palette
+   ==================================================================== */
+@theme {
+  /* Colours */
+  --color-ivory:      #F7F5EE;   /* warm background */
+  --color-ivory-alt:  #F0EDE3;   /* slightly deeper ivory for sections */
+  --color-forest:     #173F35;   /* deep forest green — primary brand */
+  --color-forest-mid: #1E5246;   /* lighter forest for hover states */
+  --color-charcoal:   #20241F;   /* near-black text */
+  --color-yellow:     #EBCB63;   /* warm yellow — accents / controls */
+  --color-yellow-dark:#C9A838;   /* darker yellow for hover on yellow bg */
+  --color-white:      #FFFFFF;
+  --color-border:     #DDD9CC;   /* warm neutral border */
+  --color-border-sub: #ECEAE3;
+  --color-ink:        #20241F;
+  --color-ink-muted:  #5A5F59;
+  --color-ink-sub:    #8A8F88;
+
+  /* Typography */
+  --font-family-sans:    'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-display: 'Plus Jakarta Sans', sans-serif;
+  --font-family-mono:    'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Shadows */
+  --shadow-card:   0 2px 12px -2px rgba(23, 63, 53, 0.07), 0 1px 4px -1px rgba(23, 63, 53, 0.04);
+  --shadow-raised: 0 8px 24px -6px rgba(23, 63, 53, 0.10), 0 3px 8px -2px rgba(23, 63, 53, 0.05);
+  --shadow-float:  0 20px 40px -8px rgba(32, 36, 31, 0.14);
+}
+
+/* ====================================================================
+   BASE
+   ==================================================================== */
+:root {
+  /* Convenience CSS vars for use outside Tailwind */
+  --ivory:      #F7F5EE;
+  --forest:     #173F35;
+  --charcoal:   #20241F;
+  --yellow:     #EBCB63;
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: light;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #F7F5EE;
+  color: #20241F;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+/* ====================================================================
+   TYPOGRAPHY SCALE
+   ==================================================================== */
+.text-hero {
+  font-size: clamp(2.375rem, 5.5vw, 5rem);
+  line-height: 1.07;
+  letter-spacing: -0.03em;
+  font-weight: 800;
+}
+.text-section {
+  font-size: clamp(1.75rem, 3vw, 2.75rem);
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  font-weight: 800;
+}
+.text-card-title {
+  font-size: clamp(1.125rem, 1.5vw, 1.375rem);
+  line-height: 1.3;
+  font-weight: 700;
+}
+.text-body {
+  font-size: clamp(1rem, 1.1vw, 1.125rem);
+  line-height: 1.6;
+}
+.text-small {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+.text-meta {
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+/* ====================================================================
+   LAYOUT CONTAINERS
+   ==================================================================== */
+.container-main {
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 5vw, 4rem);
+}
+
+.section-py {
+  padding-block: clamp(3rem, 7vw, 7rem);
+}
+.section-py-sm {
+  padding-block: clamp(2rem, 4vw, 4rem);
+}
+
+/* Prose measure constraint */
+.measure {
+  max-width: 65ch;
+}
+.measure-sm {
+  max-width: 52ch;
+}
+
+/* ====================================================================
+   BUTTONS
+   ==================================================================== */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #EBCB63;
+  color: #20241F;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  padding: 0.75rem 1.75rem;
+  letter-spacing: -0.01em;
+  transition: background-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn-primary:hover {
+  background-color: #C9A838;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(235, 203, 99, 0.35);
+}
+.btn-primary:focus-visible {
+  outline: 3px solid #173F35;
+  outline-offset: 3px;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: transparent;
+  color: #F7F5EE;
+  border: 1.5px solid rgba(247, 245, 238, 0.5);
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  padding: 0.75rem 1.75rem;
+  letter-spacing: -0.01em;
+  transition: border-color 0.18s ease, background-color 0.18s ease, transform 0.18s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn-secondary:hover {
+  border-color: rgba(247, 245, 238, 0.9);
+  background-color: rgba(247, 245, 238, 0.08);
+  transform: translateY(-2px);
+}
+.btn-secondary:focus-visible {
+  outline: 3px solid #EBCB63;
+  outline-offset: 3px;
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: transparent;
+  color: #173F35;
+  border: 1.5px solid #173F35;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  padding: 0.75rem 1.75rem;
+  letter-spacing: -0.01em;
+  transition: background-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn-outline:hover {
+  background-color: #173F35;
+  color: #F7F5EE;
+  transform: translateY(-2px);
+}
+.btn-outline:focus-visible {
+  outline: 3px solid #173F35;
+  outline-offset: 3px;
+}
+
+.btn-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: #173F35;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  text-decoration: none;
+  transition: gap 0.18s ease, opacity 0.18s ease;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+.btn-text:hover {
+  gap: 0.625rem;
+  opacity: 0.8;
+}
+.btn-text:focus-visible {
+  outline: 3px solid #173F35;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ====================================================================
+   CARDS & PANELS
+   ==================================================================== */
+.card {
+  background-color: #FFFFFF;
+  border: 1px solid #DDD9CC;
+  border-radius: 16px;
+  transition: border-color 0.2s ease, transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease;
+}
+.card:hover {
+  border-color: #C5C0B5;
+  transform: translateY(-3px);
+  box-shadow: 0 16px 32px -8px rgba(32, 36, 31, 0.09);
+}
+
+.card-forest {
+  background-color: #173F35;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  color: #F7F5EE;
+}
+
+.panel-yellow {
+  background-color: #EBCB63;
+  border-radius: 16px;
+  color: #20241F;
+}
+
+/* ====================================================================
+   NAV PILL TABS
+   ==================================================================== */
+.tab-pill {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  padding: 0.5rem 1.125rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  background: none;
+}
+.tab-pill-active {
+  background-color: #173F35;
+  color: #F7F5EE;
+  border-color: #173F35;
+}
+.tab-pill-inactive {
+  color: #5A5F59;
+  border-color: #DDD9CC;
+  background-color: rgba(255,255,255,0.7);
+}
+.tab-pill-inactive:hover {
+  color: #20241F;
+  border-color: #C5C0B5;
+  background-color: #FFFFFF;
+}
+.tab-pill:focus-visible {
+  outline: 3px solid #173F35;
+  outline-offset: 3px;
+}
+
+/* ====================================================================
+   EYEBROW LABEL
+   ==================================================================== */
+.eyebrow {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8A8F88;
+}
+.eyebrow-forest {
+  color: #173F35;
+}
+
+/* ====================================================================
+   FLIP CARD (team)
+   ==================================================================== */
+.flip-card {
+  perspective: 1000px;
+}
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+.flip-card:hover .flip-card-inner,
+.flip-card:focus-within .flip-card-inner {
+  transform: rotateY(180deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .flip-card-inner { transition: none; }
+}
+.flip-card-front,
+.flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: 16px;
+  overflow: hidden;
+}
+.flip-card-back {
+  transform: rotateY(180deg);
+}
+
+/* ====================================================================
+   PAGE ENTRANCE
+   ==================================================================== */
+.page-enter {
+  animation: pageEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ====================================================================
+   HOVER LIFT
+   ==================================================================== */
+.hover-lift {
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px -8px rgba(32, 36, 31, 0.09);
+}
+
+/* ====================================================================
+   FOCUS VISIBLE GLOBAL
+   ==================================================================== */
+:focus-visible {
+  outline: 3px solid #173F35;
+  outline-offset: 3px;
+}
+
+/* ====================================================================
+   UTILITY: no-scrollbar
+   ==================================================================== */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ====================================================================
+   CUSTOM SCROLLBAR
+   ==================================================================== */
+::-webkit-scrollbar { width: 7px; height: 7px; }
+::-webkit-scrollbar-track { background: #EBE9E2; }
+::-webkit-scrollbar-thumb { background: #C5C0B5; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #9E9A93; }
+
+/* ====================================================================
+   GRID TEXTURE (subtle)
+   ==================================================================== */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(32, 36, 31, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(32, 36, 31, 0.04) 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+
+/* ====================================================================
+   FIELDBOOK SVG ILLUSTRATION ANIMATIONS
+   ==================================================================== */
+@keyframes drawLine {
+  from { stroke-dashoffset: 1000; }
+  to   { stroke-dashoffset: 0; }
+}
+
+.svg-draw {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: drawLine 0.9s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .svg-draw {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ====================================================================
+   ACCESSIBLE SKIP LINK
+   ==================================================================== */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  z-index: 9999;
+  background: #173F35;
+  color: #F7F5EE;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0 0 8px 8px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: top 0.2s;
+}
+.skip-link:focus {
+  top: 0;
+}
+
+/* ====================================================================
+   RESOURCE UNAVAILABLE STATE
+   ==================================================================== */
+.resource-unavailable {
+  opacity: 0.55;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Legacy class kept for HeroSlideshow compatibility */
+.page-fade {
+  animation: pageEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Legacy creso button kept to avoid breaking Opportunities modal */
+.creso-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: #173F35;
+  color: #F7F5EE;
+  border-radius: 9999px;
+  font-weight: 600;
+  padding: 0.625rem 1.4rem;
+  font-size: 0.875rem;
+  transition: background-color 0.18s ease;
+  cursor: pointer;
+  border: none;
+}
+.creso-btn-primary:hover { background-color: #1E5246; }
+
+/* Hover lift for cards that still use .hover-lift class */
+.hover-lift {
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px -8px rgba(32, 36, 31, 0.09);
+}
