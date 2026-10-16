@@ -1,26 +1,43 @@
 /**
- * Team page
+ * Team page — Civil DAMP
  *
- * Fixes applied:
- * - H1 is present
- * - Essential info (name, role) never depends only on hover/flip
- * - Flip cards: accessible via focus-within (keyboard navigable)
- * - Subgroup filter tabs
- * - DAMPC section clearly distinguishes "get help" from "view committee"
- * - Phone numbers visible (not hover-only)
- * - Design tokens applied
+ * Displays DAMPC coordinators, subgroup heads, and mentors.
+ * - Center-aligned card layout (e.g. 5 members format as 3 on top, 2 below, centered)
+ * - Cards display ONLY Name, Roll Number, and Sub Division (descriptions removed)
  */
 
 import { useState } from 'react'
-import { Mail, Phone } from 'lucide-react'
 import { subgroupHeads, mentors, dampc } from '../data/dummy'
 
-function InitialsAvatar({ name, size = 44, bg = '#173F35', color = '#F7F5EE', fontSize = 15 }) {
-  const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
+function getRollNumber(person) {
+  if (person.rollNo) return person.rollNo
+  const match = (person.ldap || person.email || '').match(/\b([0-9]{2}[a-zA-Z]{1,2}[0-9]{3,5})\b/i)
+  if (match) return match[1].toUpperCase()
+  if (person.email && !person.email.includes('comingsoon') && !person.email.includes('@iitb.ac.in')) {
+    return person.email.toUpperCase()
+  }
+  return ''
+}
+
+function InitialsAvatar({ name, size = 68, fontSize = 24 }) {
+  const initials = name
+    .split(' ')
+    .filter(Boolean)
+    .map(w => w[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
+
   return (
     <div
-      className="rounded-full flex items-center justify-center font-bold shrink-0"
-      style={{ width: size, height: size, background: bg, color, fontSize }}
+      className="rounded-full flex items-center justify-center font-bold shrink-0 shadow-sm"
+      style={{
+        width: size,
+        height: size,
+        background: 'linear-gradient(135deg, #173F35 0%, #24584C 100%)',
+        color: '#EBCB63',
+        fontSize,
+      }}
       aria-hidden="true"
     >
       {initials}
@@ -28,128 +45,46 @@ function InitialsAvatar({ name, size = 44, bg = '#173F35', color = '#F7F5EE', fo
   )
 }
 
-function MemberCard({ person, showSubgroup = false }) {
-  const [expanded, setExpanded] = useState(false)
-  const hasPhoto = person.photo && person.photo !== ''
+function PersonCard({ person, subDivision }) {
+  const hasPhoto = Boolean(person.photo && person.photo.trim() !== '')
+  const rollNo = getRollNumber(person)
+  const division = subDivision || person.subgroup || person.role || 'Civil DAMP'
 
   return (
     <div
-      className="rounded-2xl overflow-hidden"
-      style={{ background: '#FFFFFF', border: '1px solid #DDD9CC' }}
+      className="w-[260px] rounded-2xl overflow-hidden bg-white shadow-sm hover-lift flex flex-col items-center text-center transition-all duration-200"
+      style={{ border: '1px solid #DDD9CC' }}
     >
-      {/* Photo or initials */}
-      <div className="relative" style={{ height: 180 }}>
+      {/* Photo or Initials */}
+      <div className="w-full h-56 bg-[#F0EDE3] flex items-center justify-center overflow-hidden relative">
         {hasPhoto ? (
           <img
             src={person.photo}
-            alt={`${person.name}`}
+            alt={person.name}
             className="w-full h-full object-cover object-top"
             loading="lazy"
           />
         ) : (
-          <div
-            className="w-full h-full flex items-center justify-center"
-            style={{ background: '#F0EDE3' }}
-          >
-            <InitialsAvatar name={person.name} size={60} bg="#173F35" color="#EBCB63" fontSize={22} />
-          </div>
+          <InitialsAvatar name={person.name} size={72} fontSize={24} />
         )}
-        {/* Name overlay — always visible, not hover-only */}
-        <div
-          className="absolute bottom-0 left-0 right-0 px-3 py-2"
-          style={{ background: 'linear-gradient(to top, rgba(23,63,53,0.92) 0%, transparent 100%)' }}
-        >
-          <p className="font-bold text-sm leading-tight" style={{ color: '#F7F5EE' }}>{person.name}</p>
-          {showSubgroup && (
-            <p className="text-meta" style={{ color: 'rgba(235,203,99,0.85)' }}>{person.subgroup}</p>
-          )}
-        </div>
       </div>
 
-      {/* Info — always visible below photo */}
-      <div className="p-4">
-        {person.intro && (
-          <>
-            <p
-              className="text-small leading-relaxed"
-              style={{ color: '#5A5F59', WebkitLineClamp: expanded ? 'unset' : 3, display: '-webkit-box', WebkitBoxOrient: 'vertical', overflow: expanded ? 'visible' : 'hidden' }}
-            >
-              {person.intro}
-            </p>
-            {person.intro.length > 120 && (
-              <button
-                className="text-meta font-semibold mt-1"
-                style={{ color: '#173F35', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                onClick={() => setExpanded(e => !e)}
-                aria-expanded={expanded}
-              >
-                {expanded ? 'Show less' : 'Read more'}
-              </button>
-            )}
-          </>
-        )}
-
-        {(() => {
-          const email = person.email
-          if (!email || email.toLowerCase().includes('comingsoon')) return null
-          const fullEmail = email.includes('@') ? email : `${email.toLowerCase()}@iitb.ac.in`
-          return (
-            <a
-              href={`mailto:${fullEmail}`}
-              className="flex items-center gap-1.5 mt-2 text-meta"
-              style={{ color: '#8A8F88', textDecoration: 'none' }}
-              onMouseEnter={e => { e.currentTarget.style.color = '#173F35' }}
-              onMouseLeave={e => { e.currentTarget.style.color = '#8A8F88' }}
-              aria-label={`Email ${person.name}`}
-            >
-              <Mail size={12} /> {fullEmail}
-            </a>
-          )
-        })()}
-      </div>
-    </div>
-  )
-}
-
-function DAMPCCard({ person }) {
-  return (
-    <div
-      className="rounded-2xl p-6"
-      style={{ background: '#FFFFFF', border: '1px solid #DDD9CC' }}
-    >
-      <div className="flex items-start gap-4 mb-4">
-        <InitialsAvatar name={person.name} size={52} bg="#EBCB63" color="#173F35" fontSize={18} />
-        <div>
-          <p className="font-bold text-lg" style={{ color: '#20241F' }}>{person.name}</p>
-          <span
-            className="inline-block text-meta font-semibold px-2.5 py-0.5 rounded-full mt-1"
-            style={{ background: 'rgba(23,63,53,0.1)', color: '#173F35' }}
-          >
-            {person.role}
-          </span>
-          <p className="text-small mt-0.5" style={{ color: '#8A8F88' }}>{person.year}</p>
-        </div>
-      </div>
-      {person.description && (
-        <p className="text-small leading-relaxed mb-3" style={{ color: '#5A5F59' }}>{person.description}</p>
-      )}
-      <div className="space-y-1.5">
-        {person.ldap && (
-          <a
-            href={`mailto:${person.ldap}`}
-            className="flex items-center gap-2 text-small"
-            style={{ color: '#173F35', textDecoration: 'none' }}
-            onMouseEnter={e => e.currentTarget.style.textDecoration = 'underline'}
-            onMouseLeave={e => e.currentTarget.style.textDecoration = 'none'}
-          >
-            <Mail size={14} /> {person.ldap}
-          </a>
-        )}
-        {person.phone && (
-          <p className="flex items-center gap-2 text-small" style={{ color: '#8A8F88' }}>
-            <Phone size={14} /> {person.phone}
+      {/* Details: Name, Roll Number, Sub Division ONLY */}
+      <div className="p-4 w-full flex flex-col items-center gap-1.5">
+        <h3 className="font-bold text-base leading-snug text-[#20241F]">
+          {person.name}
+        </h3>
+        {rollNo && (
+          <p className="text-xs font-mono font-semibold tracking-wider text-[#5A5F59]">
+            {rollNo}
           </p>
         )}
+        <span
+          className="inline-block text-xs font-semibold px-3 py-1 rounded-full mt-1"
+          style={{ background: 'rgba(23,63,53,0.08)', color: '#173F35' }}
+        >
+          {division}
+        </span>
       </div>
     </div>
   )
@@ -178,18 +113,18 @@ export default function Team() {
     >
       {/* Header */}
       <div
-        className="section-py-sm"
+        className="section-py-sm text-center"
         style={{ background: '#173F35', borderBottom: '1px solid rgba(235,203,99,0.15)' }}
       >
-        <div className="container-main">
+        <div className="container-main flex flex-col items-center">
           <span className="eyebrow" style={{ color: '#EBCB63', marginBottom: '0.5rem', display: 'block' }}>
             Civil DAMP
           </span>
-          <h1 className="text-section" style={{ color: '#F7F5EE', maxWidth: '20ch' }}>
-            Meet the team
+          <h1 className="text-section" style={{ color: '#F7F5EE' }}>
+            Meet the Team
           </h1>
           <p
-            className="text-body mt-3"
+            className="text-body mt-3 text-center"
             style={{ color: 'rgba(247,245,238,0.75)', maxWidth: '48ch' }}
           >
             The DAMP team is available to help you navigate academics, courses, and campus life. Reach us directly at{' '}
@@ -205,16 +140,16 @@ export default function Team() {
 
       {/* ── DAMPC Overall Heads ── */}
       <section className="section-py-sm" style={{ background: '#FFFFFF', borderBottom: '1px solid #E8E5DC' }}>
-        <div className="container-main">
-          <div className="mb-6">
+        <div className="container-main text-center">
+          <div className="mb-8 flex flex-col items-center">
             <span className="eyebrow" style={{ marginBottom: '0.3rem', display: 'block' }}>Overall coordinators</span>
-            <h2 className="text-card-title" style={{ color: '#20241F' }}>
-              DAMPC — Reach out for mentorship or queries
+            <h2 className="text-card-title text-center" style={{ color: '#20241F' }}>
+              DAMPC — Department Academic Mentorship Program
             </h2>
           </div>
-          <div className="grid sm:grid-cols-2 gap-5" style={{ maxWidth: 700 }}>
+          <div className="flex flex-wrap justify-center gap-6 max-w-[860px] mx-auto">
             {dampc.map(person => (
-              <DAMPCCard key={person.id} person={person} />
+              <PersonCard key={person.id} person={person} subDivision="Overall Coordinator" />
             ))}
           </div>
         </div>
@@ -227,7 +162,7 @@ export default function Team() {
       >
         <div className="container-main">
           <div
-            className="flex gap-2 overflow-x-auto no-scrollbar py-3"
+            className="flex justify-center gap-2 overflow-x-auto no-scrollbar py-3"
             role="tablist"
             aria-label="Filter by subgroup"
           >
@@ -249,13 +184,16 @@ export default function Team() {
       {/* ── Subgroup Heads ── */}
       {filteredHeads.length > 0 && (
         <section className="section-py-sm" style={{ background: '#F7F5EE' }}>
-          <div className="container-main">
-            <h2 className="text-card-title mb-6" style={{ color: '#20241F' }}>
-              Subgroup heads
-            </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="container-main text-center">
+            <div className="mb-8 flex flex-col items-center">
+              <span className="eyebrow" style={{ marginBottom: '0.3rem', display: 'block' }}>Leadership</span>
+              <h2 className="text-card-title text-center" style={{ color: '#20241F' }}>
+                Subgroup Heads
+              </h2>
+            </div>
+            <div className="flex flex-wrap justify-center gap-6 max-w-[860px] mx-auto">
               {filteredHeads.map(head => (
-                <MemberCard key={head.id} person={head} showSubgroup />
+                <PersonCard key={head.id} person={head} subDivision={head.subgroup} />
               ))}
             </div>
           </div>
@@ -268,13 +206,16 @@ export default function Team() {
           className="section-py-sm"
           style={{ background: '#FFFFFF', borderTop: '1px solid #E8E5DC' }}
         >
-          <div className="container-main">
-            <h2 className="text-card-title mb-6" style={{ color: '#20241F' }}>
-              {activeSubgroup === 'All' ? 'All members' : `${activeSubgroup} members`}
-            </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="container-main text-center">
+            <div className="mb-8 flex flex-col items-center">
+              <span className="eyebrow" style={{ marginBottom: '0.3rem', display: 'block' }}>Team Members</span>
+              <h2 className="text-card-title text-center" style={{ color: '#20241F' }}>
+                {activeSubgroup === 'All' ? 'All Members' : `${activeSubgroup} Members`}
+              </h2>
+            </div>
+            <div className="flex flex-wrap justify-center gap-6 max-w-[860px] mx-auto">
               {filteredMentors.map(mentor => (
-                <MemberCard key={mentor.id} person={mentor} showSubgroup={activeSubgroup === 'All'} />
+                <PersonCard key={mentor.id} person={mentor} />
               ))}
             </div>
           </div>

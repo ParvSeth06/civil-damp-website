@@ -14,11 +14,11 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
-import { X, ChevronDown, ChevronRight, Search, FileText, Folder, ExternalLink, FlaskConical, AlertCircle } from 'lucide-react'
+import { X, ChevronDown, ChevronRight, Search, ExternalLink, FlaskConical, AlertCircle } from 'lucide-react'
 import ErrorBoundary from '../components/ErrorBoundary'
-import { courseReviews, curriculum, academicResources, specializations } from '../data/dummy'
+import { courseReviews, curriculum, specializations } from '../data/dummy'
 
-const TABS = ['Curriculum', 'Specializations & Labs', 'Course Reviews', 'Resources']
+const TABS = ['Curriculum', 'Specializations & Labs', 'Course Reviews']
 
 // Derive count honestly
 const REVIEW_COUNT = courseReviews.length
@@ -180,7 +180,7 @@ export default function Academics() {
             Academics
           </span>
           <h1 className="text-section" style={{ color: '#F7F5EE', maxWidth: '24ch' }}>
-            Curriculum, reviews & resources
+            Curriculum, specializations & reviews
           </h1>
         </div>
       </div>
@@ -515,61 +515,6 @@ export default function Academics() {
           </div>
         )}
 
-        {/* ── TAB 3: Resources ── */}
-        {activeTab === 3 && (
-          <div className="space-y-10">
-
-            {academicResources.map((section, idx) => (
-              <div key={idx}>
-                <h2 className="text-card-title mb-4" style={{ color: '#20241F' }}>{section.category}</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {section.items.map((item, i) => {
-                    const unavailable = item.link === '#'
-                    return (
-                      <div
-                        key={i}
-                        className={`rounded-2xl p-5 flex items-start gap-3.5 ${unavailable ? '' : 'hover-lift'}`}
-                        style={{
-                          background: unavailable ? '#F7F5EE' : '#FFFFFF',
-                          border: '1px solid #DDD9CC',
-                          opacity: unavailable ? 0.7 : 1,
-                        }}
-                      >
-                        <div
-                          className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                          style={{ background: unavailable ? '#ECEAE3' : '#F0EDE3', color: unavailable ? '#8A8F88' : '#173F35' }}
-                        >
-                          {item.type === 'Folder' ? <Folder size={18} /> : <FileText size={18} />}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="text-small font-bold leading-tight mb-1" style={{ color: unavailable ? '#8A8F88' : '#20241F' }}>
-                            {item.title}
-                          </h4>
-                          {unavailable ? (
-                            <p className="text-meta" style={{ color: '#8A8F88' }}>Not yet available</p>
-                          ) : (
-                            <>
-                              <p className="text-meta" style={{ color: '#8A8F88' }}>{item.type}</p>
-                              <a
-                                href={item.link}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="btn-text mt-2 text-meta"
-                                style={{ fontSize: '0.8125rem', color: '#173F35' }}
-                              >
-                                Open <ExternalLink size={11} />
-                              </a>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
         </ErrorBoundary>
       </div>
 

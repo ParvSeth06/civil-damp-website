@@ -45,10 +45,10 @@ const actions = [
   },
   {
     icon: Users,
-    label: 'Study Resources',
-    desc: 'Curriculum structure, previous year exam papers, reference materials, and academic guidelines.',
-    path: '/academics?tab=3',
-    cta: 'Browse resources',
+    label: 'Curriculum & Structure',
+    desc: 'B.Tech civil engineering curriculum layout, semester-wise credit distribution, and departmental electives.',
+    path: '/academics?tab=0',
+    cta: 'View curriculum',
     variant: 'outline',
   },
 ]

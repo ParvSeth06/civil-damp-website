@@ -14,7 +14,6 @@ const navCols = [
       { label: 'Curriculum & Structure', path: '/academics?tab=0' },
       { label: 'Specializations & Labs', path: '/academics?tab=1' },
       { label: 'Course Reviews', path: '/academics?tab=2' },
-      { label: 'Academic Resources', path: '/academics?tab=3' },
     ],
   },
   {
