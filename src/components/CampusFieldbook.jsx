@@ -1,310 +1,375 @@
 /**
- * CampusFieldbook — SVG "Civil campus fieldbook" hero illustration.
- *
- * Features:
- * - A structural bridge frame, contour lines, a water baseline
- * - Three labeled destination nodes: Courses, Research, Mentors
- * - Line-drawing animation (~0.9 s) via stroke-dashoffset
- * - Reduced-motion: static fully-drawn version
- * - Each destination node is a real accessible link
- * - Hover/focus highlight on nodes
- * - Stops offscreen animation via IntersectionObserver
+ * CampusFieldbook — Engineering drawing sheet featuring an architectural bridge illustration
+ * with three clearly visible, accessible, interactive destinations:
+ * - Courses   → /academics?tab=2
+ * - Research  → /opportunities?tab=1
+ * - Mentors   → /team
  */
 
-import { useEffect, useRef, useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
+import { BookOpen, FlaskConical, Users, ArrowUpRight } from 'lucide-react'
 
 const prefersReducedMotion =
   typeof window !== 'undefined' &&
   window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
+const DESTINATIONS = [
+  {
+    id: 'courses',
+    label: 'Courses',
+    subLabel: 'Reviews & guides',
+    path: '/academics?tab=2',
+    icon: BookOpen,
+    nodeX: 135,
+    nodeY: 105,
+    desktopPos: { top: '16%', left: '8%' },
+  },
+  {
+    id: 'research',
+    label: 'Research',
+    subLabel: 'Labs & faculty',
+    path: '/opportunities?tab=1',
+    icon: FlaskConical,
+    nodeX: 280,
+    nodeY: 175,
+    desktopPos: { top: '48%', left: '50%', transform: 'translate(-50%, -50%)' },
+  },
+  {
+    id: 'mentors',
+    label: 'Mentors',
+    subLabel: 'Meet the team',
+    path: '/team',
+    icon: Users,
+    nodeX: 425,
+    nodeY: 105,
+    desktopPos: { top: '16%', right: '8%' },
+  },
+]
+
 export default function CampusFieldbook() {
-  const svgRef = useRef(null)
-  const [animated, setAnimated] = useState(false)
+  const containerRef = useRef(null)
+  const [animated, setAnimated] = useState(prefersReducedMotion)
+  const [hoveredNode, setHoveredNode] = useState(null)
 
   useEffect(() => {
     if (prefersReducedMotion) {
       setAnimated(true)
       return
     }
-    const el = svgRef.current
+    const el = containerRef.current
     if (!el) return
-    const obs = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setAnimated(true) },
-      { threshold: 0.2 }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setAnimated(true)
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.15 }
     )
-    obs.observe(el)
-    return () => obs.disconnect()
+    observer.observe(el)
+    return () => observer.disconnect()
   }, [])
 
   return (
     <div
-      ref={svgRef}
-      className="relative w-full"
-      style={{ maxWidth: 560, margin: '0 auto' }}
-      role="img"
-      aria-label="Civil engineering fieldbook illustration showing a bridge frame with links to Courses, Research, and Mentors"
+      ref={containerRef}
+      className="relative w-full rounded-3xl overflow-hidden shadow-2xl transition-all duration-300"
+      style={{
+        background: '#FAF8F2',
+        border: '1.5px solid #DDD9CC',
+        maxWidth: 580,
+        margin: '0 auto',
+      }}
     >
-      <svg
-        viewBox="0 0 560 400"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        style={{ width: '100%', height: 'auto', overflow: 'visible' }}
-        aria-hidden="true"
-      >
-        {/* ── Contour lines (background topography) ── */}
-        <g opacity="0.35">
-          {[340, 360, 378, 394].map((y, i) => (
-            <path
-              key={y}
-              d={`M 20 ${y} Q 150 ${y - 12 + i * 3} 280 ${y} Q 400 ${y + 10 - i * 2} 540 ${y}`}
-              stroke="#173F35"
-              strokeWidth="1.2"
-              strokeLinecap="round"
-              className={animated ? 'svg-draw' : ''}
-              style={{ animationDelay: `${0.05 + i * 0.06}s`, animationDuration: '0.7s' }}
-            />
-          ))}
-        </g>
-
-        {/* ── Water line ── */}
-        <path
-          d="M 20 352 Q 100 346 180 352 Q 260 358 340 352 Q 420 346 540 352"
-          stroke="#4A9B8C"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          opacity="0.6"
-          className={animated ? 'svg-draw' : ''}
-          style={{ animationDelay: '0.1s', animationDuration: '0.75s' }}
-        />
-        {/* Water ripple accents */}
-        {[120, 200, 310, 440].map((x, i) => (
-          <ellipse
-            key={x}
-            cx={x}
-            cy={352}
-            rx={18 + i * 4}
-            ry={4}
-            stroke="#4A9B8C"
-            strokeWidth="1"
-            opacity="0.3"
-            className={animated ? 'svg-draw' : ''}
-            style={{ animationDelay: `${0.3 + i * 0.05}s`, animationDuration: '0.5s' }}
-          />
-        ))}
-
-        {/* ── Bridge deck (main horizontal) ── */}
-        <path
-          d="M 60 260 L 500 260"
-          stroke="#173F35"
-          strokeWidth="4"
-          strokeLinecap="round"
-          className={animated ? 'svg-draw' : ''}
-          style={{ animationDelay: '0.15s', animationDuration: '0.6s' }}
-        />
-
-        {/* ── Bridge pylon / towers ── */}
-        {/* Left tower */}
-        <path
-          d="M 150 260 L 150 150 M 130 155 L 170 155 M 120 140 L 180 140"
-          stroke="#173F35"
-          strokeWidth="3.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className={animated ? 'svg-draw' : ''}
-          style={{ animationDelay: '0.22s', animationDuration: '0.55s' }}
-        />
-        {/* Right tower */}
-        <path
-          d="M 410 260 L 410 150 M 390 155 L 430 155 M 380 140 L 440 140"
-          stroke="#173F35"
-          strokeWidth="3.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className={animated ? 'svg-draw' : ''}
-          style={{ animationDelay: '0.25s', animationDuration: '0.55s' }}
-        />
-
-        {/* ── Suspension cables from left tower ── */}
-        {[60, 100, 200, 280].map((x, i) => (
-          <line
-            key={`lc${x}`}
-            x1="150" y1="140"
-            x2={x} y2="260"
-            stroke="#173F35"
-            strokeWidth="1.5"
-            opacity="0.5"
-            className={animated ? 'svg-draw' : ''}
-            style={{ animationDelay: `${0.3 + i * 0.04}s`, animationDuration: '0.5s' }}
-          />
-        ))}
-        {/* ── Suspension cables from right tower ── */}
-        {[500, 460, 360, 280].map((x, i) => (
-          <line
-            key={`rc${x}`}
-            x1="410" y1="140"
-            x2={x} y2="260"
-            stroke="#173F35"
-            strokeWidth="1.5"
-            opacity="0.5"
-            className={animated ? 'svg-draw' : ''}
-            style={{ animationDelay: `${0.3 + i * 0.04}s`, animationDuration: '0.5s' }}
-          />
-        ))}
-
-        {/* ── Bridge piers down to water ── */}
-        <line x1="150" y1="260" x2="150" y2="348" stroke="#173F35" strokeWidth="6" strokeLinecap="round"
-          className={animated ? 'svg-draw' : ''}
-          style={{ animationDelay: '0.4s', animationDuration: '0.45s' }} />
-        <line x1="410" y1="260" x2="410" y2="348" stroke="#173F35" strokeWidth="6" strokeLinecap="round"
-          className={animated ? 'svg-draw' : ''}
-          style={{ animationDelay: '0.4s', animationDuration: '0.45s' }} />
-
-        {/* ── Road texture ── */}
-        {[100, 140, 180, 220, 260, 300, 340, 380, 420, 460].map((x, i) => (
-          <line key={x} x1={x} y1="260" x2={x + 25} y2="260"
-            stroke="#F7F5EE" strokeWidth="2.5" strokeDasharray="12 8"
-            opacity="0.6"
-            className={animated ? 'svg-draw' : ''}
-            style={{ animationDelay: `${0.5 + i * 0.02}s`, animationDuration: '0.4s' }} />
-        ))}
-
-        {/* ── Grid reference marks (surveying / fieldbook) ── */}
-        {[[60, 320], [280, 300], [500, 320]].map(([x, y], i) => (
-          <g key={i} opacity="0.3">
-            <line x1={x - 6} y1={y} x2={x + 6} y2={y} stroke="#173F35" strokeWidth="1.5" />
-            <line x1={x} y1={y - 6} x2={x} y2={y + 6} stroke="#173F35" strokeWidth="1.5" />
-          </g>
-        ))}
-
-        {/* ── North arrow (fieldbook detail) ── */}
-        <g transform="translate(508, 72)" opacity="0.6">
-          <circle cx="0" cy="0" r="16" stroke="#173F35" strokeWidth="1.5" />
-          <path d="M 0 -10 L 5 6 L 0 3 L -5 6 Z" fill="#173F35" />
-          <text x="0" y="24" textAnchor="middle" fontSize="9" fill="#173F35" fontFamily="JetBrains Mono, monospace" fontWeight="500">N</text>
-        </g>
-
-        {/* ── Scale bar (fieldbook detail) ── */}
-        <g transform="translate(30, 380)" opacity="0.4">
-          <line x1="0" y1="0" x2="80" y2="0" stroke="#173F35" strokeWidth="1.5" />
-          <line x1="0" y1="-4" x2="0" y2="4" stroke="#173F35" strokeWidth="1.5" />
-          <line x1="80" y1="-4" x2="80" y2="4" stroke="#173F35" strokeWidth="1.5" />
-          <text x="40" y="-7" textAnchor="middle" fontSize="8" fill="#173F35" fontFamily="JetBrains Mono, monospace">100m</text>
-        </g>
-
-        {/* ── DESTINATION NODE: Courses (left tower top) ── */}
-        <DestinationNode
-          x={150} y={128}
-          label="Courses"
-          subLabel="Reviews & curriculum"
-          animated={animated}
-          delay={0.55}
-          id="fieldbook-courses"
-        />
-
-        {/* ── DESTINATION NODE: Research (above centre span) ── */}
-        <DestinationNode
-          x={280} y={200}
-          label="Research"
-          subLabel="Labs & faculty"
-          animated={animated}
-          delay={0.62}
-          id="fieldbook-research"
-          alignLeft
-        />
-
-        {/* ── DESTINATION NODE: Mentors (right tower top) ── */}
-        <DestinationNode
-          x={410} y={128}
-          label="Mentors"
-          subLabel="Meet the team"
-          animated={animated}
-          delay={0.69}
-          id="fieldbook-mentors"
-          alignLeft
-        />
-      </svg>
-
-      {/* Accessible HTML link overlay matching node positions */}
+      {/* ── Drafting Sheet Header ── */}
       <div
-        aria-hidden="false"
+        className="flex items-center justify-between px-5 py-3 border-b"
         style={{
-          position: 'absolute',
-          top: 0, left: 0, width: '100%', height: '100%',
-          pointerEvents: 'none',
+          background: '#F0EDE3',
+          borderColor: '#DDD9CC',
         }}
       >
-        {/* These invisible but focusable links mirror the SVG node positions */}
-        <Link
-          to="/academics?tab=2"
-          id="fieldbook-courses"
-          className="sr-only focus:not-sr-only focus:absolute focus:bg-yellow-300 focus:text-gray-900 focus:px-2 focus:py-1 focus:rounded focus:text-sm focus:font-bold"
-          style={{ left: '24%', top: '28%' }}
+        <div className="flex items-center gap-2">
+          <span
+            className="w-2.5 h-2.5 rounded-full"
+            style={{ background: '#173F35' }}
+            aria-hidden="true"
+          />
+          <span
+            className="font-mono text-xs font-semibold uppercase tracking-widest"
+            style={{ color: '#173F35' }}
+          >
+            CIVIL DAMP · FIELDBOOK
+          </span>
+        </div>
+        <span
+          className="font-mono text-[11px] font-medium"
+          style={{ color: '#8A8F88' }}
         >
-          Browse course reviews
-        </Link>
-        <Link
-          to="/opportunities?tab=1"
-          id="fieldbook-research"
-          className="sr-only focus:not-sr-only focus:absolute focus:bg-yellow-300 focus:text-gray-900 focus:px-2 focus:py-1 focus:rounded focus:text-sm focus:font-bold"
-          style={{ left: '48%', top: '46%' }}
-        >
-          Explore research areas
-        </Link>
-        <Link
-          to="/team"
-          id="fieldbook-mentors"
-          className="sr-only focus:not-sr-only focus:absolute focus:bg-yellow-300 focus:text-gray-900 focus:px-2 focus:py-1 focus:rounded focus:text-sm focus:font-bold"
-          style={{ left: '70%', top: '28%' }}
-        >
-          Meet the mentors
-        </Link>
+          DWG NO. 01 — EXPLORE
+        </span>
       </div>
-    </div>
-  )
-}
 
-/**
- * SVG node with label — not an SVG link (SVG foreignObject is fragile);
- * actual navigation is provided by the HTML overlay above.
- */
-function DestinationNode({ x, y, label, subLabel, animated, delay, alignLeft }) {
-  const labelX = alignLeft ? x + 18 : x - 18
-  const anchor = alignLeft ? 'start' : 'end'
-  return (
-    <g className={animated ? 'svg-draw' : ''} style={{ animationDelay: `${delay}s`, animationDuration: '0.4s' }}>
-      {/* Stem */}
-      <line
-        x1={x} y1={y + 10}
-        x2={labelX + (alignLeft ? 0 : 0)} y2={y + 10}
-        stroke="#EBCB63" strokeWidth="1.5" opacity="0.6"
-      />
-      {/* Node dot */}
-      <circle cx={x} cy={y} r="7" fill="#EBCB63" stroke="#173F35" strokeWidth="2.5" />
-      <circle cx={x} cy={y} r="3" fill="#173F35" />
-      {/* Label text */}
-      <text
-        x={labelX}
-        y={y - 4}
-        textAnchor={anchor}
-        fontSize="12"
-        fontWeight="700"
-        fill="#173F35"
-        fontFamily="Plus Jakarta Sans, sans-serif"
-        letterSpacing="-0.3"
+      {/* ── Visual Canvas Container ── */}
+      <div className="relative p-3 sm:p-5">
+        {/* Architectural drawing SVG (strictly decorative, hidden from screen readers) */}
+        <svg
+          viewBox="0 0 560 330"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-full h-auto block select-none"
+          style={{ overflow: 'visible' }}
+          aria-hidden="true"
+        >
+          {/* Subtle engineering grid lines */}
+          <g opacity="0.18">
+            {[60, 120, 180, 240, 300].map(y => (
+              <line key={`gh-${y}`} x1="20" y1={y} x2="540" y2={y} stroke="#173F35" strokeWidth="0.75" strokeDasharray="3 4" />
+            ))}
+            {[100, 190, 280, 370, 460].map(x => (
+              <line key={`gv-${x}`} x1={x} y1="30" x2={x} y2="310" stroke="#173F35" strokeWidth="0.75" strokeDasharray="3 4" />
+            ))}
+          </g>
+
+          {/* Water baseline */}
+          <path
+            d="M 20 290 Q 150 285 280 290 Q 410 295 540 290"
+            stroke="#2B6256"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            className={animated ? 'svg-draw' : ''}
+            style={{ animationDuration: '0.7s' }}
+          />
+          <path
+            d="M 60 302 Q 200 298 340 302 Q 440 304 500 302"
+            stroke="#2B6256"
+            strokeWidth="1.2"
+            strokeLinecap="round"
+            opacity="0.45"
+            className={animated ? 'svg-draw' : ''}
+            style={{ animationDuration: '0.8s', animationDelay: '0.1s' }}
+          />
+
+          {/* Main horizontal bridge deck */}
+          <line
+            x1="40"
+            y1="220"
+            x2="520"
+            y2="220"
+            stroke="#173F35"
+            strokeWidth="4"
+            strokeLinecap="round"
+            className={animated ? 'svg-draw' : ''}
+            style={{ animationDuration: '0.6s', animationDelay: '0.1s' }}
+          />
+
+          {/* Left Tower */}
+          <g>
+            <path
+              d="M 135 220 L 135 70 M 118 78 L 152 78 M 125 125 L 145 125"
+              stroke="#173F35"
+              strokeWidth={hoveredNode === 'courses' ? '4' : '3'}
+              strokeLinecap="round"
+              className={animated ? 'svg-draw transition-all duration-200' : 'transition-all duration-200'}
+              style={{ animationDuration: '0.5s', animationDelay: '0.15s' }}
+            />
+            {/* Pier below deck */}
+            <line
+              x1="135" y1="220" x2="135" y2="288"
+              stroke="#173F35" strokeWidth="5.5" strokeLinecap="round"
+              className={animated ? 'svg-draw' : ''}
+              style={{ animationDuration: '0.4s', animationDelay: '0.2s' }}
+            />
+          </g>
+
+          {/* Right Tower */}
+          <g>
+            <path
+              d="M 425 220 L 425 70 M 408 78 L 442 78 M 415 125 L 435 125"
+              stroke="#173F35"
+              strokeWidth={hoveredNode === 'mentors' ? '4' : '3'}
+              strokeLinecap="round"
+              className={animated ? 'svg-draw transition-all duration-200' : 'transition-all duration-200'}
+              style={{ animationDuration: '0.5s', animationDelay: '0.15s' }}
+            />
+            {/* Pier below deck */}
+            <line
+              x1="425" y1="220" x2="425" y2="288"
+              stroke="#173F35" strokeWidth="5.5" strokeLinecap="round"
+              className={animated ? 'svg-draw' : ''}
+              style={{ animationDuration: '0.4s', animationDelay: '0.2s' }}
+            />
+          </g>
+
+          {/* Main Arch / Suspension Catenaries */}
+          <path
+            d="M 40 220 Q 135 110 280 205 Q 425 110 520 220"
+            stroke="#173F35"
+            strokeWidth={hoveredNode === 'research' ? '3' : '2'}
+            strokeLinecap="round"
+            className={animated ? 'svg-draw transition-all duration-200' : 'transition-all duration-200'}
+            style={{ animationDuration: '0.65s', animationDelay: '0.2s' }}
+          />
+
+          {/* Left Stay Cables */}
+          {[60, 95, 180, 225].map((x, i) => (
+            <line
+              key={`c-left-${x}`}
+              x1="135"
+              y1="75"
+              x2={x}
+              y2="220"
+              stroke="#173F35"
+              strokeWidth="1.2"
+              opacity={hoveredNode === 'courses' ? '0.85' : '0.4'}
+              className={animated ? 'svg-draw transition-opacity duration-200' : 'transition-opacity duration-200'}
+              style={{ animationDuration: '0.45s', animationDelay: `${0.25 + i * 0.04}s` }}
+            />
+          ))}
+
+          {/* Right Stay Cables */}
+          {[335, 380, 465, 500].map((x, i) => (
+            <line
+              key={`c-right-${x}`}
+              x1="425"
+              y1="75"
+              x2={x}
+              y2="220"
+              stroke="#173F35"
+              strokeWidth="1.2"
+              opacity={hoveredNode === 'mentors' ? '0.85' : '0.4'}
+              className={animated ? 'svg-draw transition-opacity duration-200' : 'transition-opacity duration-200'}
+              style={{ animationDuration: '0.45s', animationDelay: `${0.25 + i * 0.04}s` }}
+            />
+          ))}
+
+          {/* Center Vertical Suspenders */}
+          {[250, 280, 310].map((x, i) => (
+            <line
+              key={`c-center-${x}`}
+              x1={x}
+              y1="205"
+              x2={x}
+              y2="220"
+              stroke="#173F35"
+              strokeWidth="1.5"
+              opacity={hoveredNode === 'research' ? '0.9' : '0.45'}
+              className={animated ? 'svg-draw transition-opacity duration-200' : 'transition-opacity duration-200'}
+              style={{ animationDuration: '0.4s', animationDelay: `${0.3 + i * 0.04}s` }}
+            />
+          ))}
+
+          {/* Structural node markers */}
+          <circle cx="135" cy="72" r="5" fill="#EBCB63" stroke="#173F35" strokeWidth="2" />
+          <circle cx="425" cy="72" r="5" fill="#EBCB63" stroke="#173F35" strokeWidth="2" />
+          <circle cx="280" cy="205" r="5" fill="#EBCB63" stroke="#173F35" strokeWidth="2" />
+        </svg>
+
+        {/* ── Desktop Interactive Navigation Overlay ── */}
+        <nav
+          aria-label="Direct fieldbook destinations"
+          className="hidden sm:block absolute inset-0 pointer-events-none"
+        >
+          {DESTINATIONS.map(dest => {
+            const isHovered = hoveredNode === dest.id
+            const Icon = dest.icon
+            return (
+              <Link
+                key={dest.id}
+                to={dest.path}
+                onMouseEnter={() => setHoveredNode(dest.id)}
+                onMouseLeave={() => setHoveredNode(null)}
+                onFocus={() => setHoveredNode(dest.id)}
+                onBlur={() => setHoveredNode(null)}
+                className="group pointer-events-auto absolute flex items-center gap-2.5 px-3.5 py-2 rounded-2xl transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#173F35] focus-visible:outline-offset-2"
+                style={{
+                  ...dest.desktopPos,
+                  background: isHovered ? '#FFFFFF' : 'rgba(255, 255, 255, 0.94)',
+                  border: isHovered ? '1.5px solid #173F35' : '1.5px solid #DDD9CC',
+                  boxShadow: isHovered
+                    ? '0 8px 20px -4px rgba(23, 63, 53, 0.16)'
+                    : '0 3px 10px rgba(0, 0, 0, 0.04)',
+                  transform: isHovered ? 'scale(1.04)' : 'scale(1)',
+                  minHeight: 46,
+                }}
+                aria-label={`${dest.label}: ${dest.subLabel}`}
+              >
+                <div
+                  className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors duration-200 shrink-0"
+                  style={{
+                    background: isHovered ? '#173F35' : '#F0EDE3',
+                    color: isHovered ? '#EBCB63' : '#173F35',
+                  }}
+                >
+                  <Icon size={15} />
+                </div>
+                <div className="text-left pr-1">
+                  <div className="flex items-center gap-1">
+                    <span
+                      className="font-bold text-sm leading-tight transition-colors"
+                      style={{ color: '#20241F' }}
+                    >
+                      {dest.label}
+                    </span>
+                    <ArrowUpRight
+                      size={12}
+                      className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                      style={{ color: '#173F35' }}
+                    />
+                  </div>
+                  <span
+                    className="font-mono text-[11px] block leading-tight mt-0.5"
+                    style={{ color: '#5A5F59' }}
+                  >
+                    {dest.subLabel}
+                  </span>
+                </div>
+              </Link>
+            )
+          })}
+        </nav>
+      </div>
+
+      {/* ── Mobile Navigation Bar (Clean, accessible, tap-friendly ≥44px buttons below drawing) ── */}
+      <nav
+        aria-label="Direct fieldbook destinations (mobile)"
+        className="sm:hidden grid grid-cols-3 gap-1.5 p-2.5 border-t"
+        style={{
+          background: '#F0EDE3',
+          borderColor: '#DDD9CC',
+        }}
       >
-        {label}
-      </text>
-      <text
-        x={labelX}
-        y={y + 11}
-        textAnchor={anchor}
-        fontSize="9.5"
-        fill="#5A5F59"
-        fontFamily="JetBrains Mono, monospace"
-      >
-        {subLabel}
-      </text>
-    </g>
+        {DESTINATIONS.map(dest => {
+          const Icon = dest.icon
+          return (
+            <Link
+              key={dest.id}
+              to={dest.path}
+              className="flex flex-col items-center justify-center py-2.5 px-1.5 rounded-xl text-center transition-colors active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#173F35]"
+              style={{
+                background: '#FFFFFF',
+                border: '1px solid #DDD9CC',
+                minHeight: 52,
+              }}
+            >
+              <div
+                className="w-6 h-6 rounded-md flex items-center justify-center mb-1"
+                style={{ background: '#FAF8F2', color: '#173F35' }}
+              >
+                <Icon size={14} />
+              </div>
+              <span className="font-bold text-xs" style={{ color: '#20241F' }}>
+                {dest.label}
+              </span>
+              <span className="font-mono text-[9px]" style={{ color: '#8A8F88' }}>
+                {dest.subLabel.split('&')[0]}
+              </span>
+            </Link>
+          )
+        })}
+      </nav>
+    </div>
   )
 }

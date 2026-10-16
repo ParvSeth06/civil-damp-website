@@ -14,7 +14,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
-import { X, ChevronDown, ChevronRight, Search, FileText, Folder, ExternalLink, FlaskConical } from 'lucide-react'
+import { X, ChevronDown, ChevronRight, Search, FileText, Folder, ExternalLink, FlaskConical, AlertCircle } from 'lucide-react'
+import ErrorBoundary from '../components/ErrorBoundary'
 import { courseReviews, curriculum, academicResources, specializations } from '../data/dummy'
 
 const TABS = ['Curriculum', 'Specializations & Labs', 'Course Reviews', 'Resources']
@@ -229,8 +230,13 @@ export default function Academics() {
         aria-labelledby={`tab-${activeTab}`}
         className="container-main section-py"
       >
-
-        {/* ── TAB 0: Curriculum ── */}
+        <ErrorBoundary
+          fallbackTitle="This academic section could not load"
+          fallbackMessage="We encountered an issue displaying this tab's content. You can try reloading or switch to another academic section."
+          returnUrl="/academics?tab=0"
+          returnLabel="Curriculum overview"
+        >
+          {/* ── TAB 0: Curriculum ── */}
         {activeTab === 0 && (
           <div>
             <p
@@ -564,6 +570,7 @@ export default function Academics() {
             ))}
           </div>
         )}
+        </ErrorBoundary>
       </div>
 
       {/* Modal */}

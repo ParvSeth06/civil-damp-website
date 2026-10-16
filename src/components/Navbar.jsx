@@ -85,17 +85,20 @@ export default function Navbar() {
 
       <header
         ref={navRef}
-        className="fixed top-0 left-0 right-0 z-50 transition-transform duration-300"
-        style={{ transform: visible ? 'translateY(0)' : 'translateY(-110%)' }}
+        className="fixed top-0 left-0 right-0 w-full z-50 transition-transform duration-300"
+        style={{
+          transform: visible ? 'translateY(0)' : 'translateY(-110%)',
+          background: 'rgba(23, 63, 53, 0.97)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          borderBottom: '1px solid rgba(235, 203, 99, 0.15)',
+        }}
       >
         <div
           className="mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8"
           style={{
             maxWidth: 1240,
             height: 64,
-            background: 'rgba(23, 63, 53, 0.97)',
-            backdropFilter: 'blur(16px)',
-            borderBottom: '1px solid rgba(235, 203, 99, 0.15)',
           }}
         >
           {/* Logo */}
