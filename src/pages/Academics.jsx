@@ -341,24 +341,18 @@ export default function Academics() {
                   style={{ background: '#FFFFFF', border: '1px solid #DDD9CC' }}
                 >
                   <div>
-                    <div className="flex items-center justify-between mb-3 gap-2">
-                      <span
-                        className="text-meta font-bold font-mono px-2 py-0.5 rounded-md"
-                        style={{ background: '#F0EDE3', color: '#20241F' }}
-                      >
-                        {spec.code} · Est. {spec.established}
-                      </span>
+                    <div className="flex items-start justify-between mb-2 gap-3">
+                      <h3 className="text-card-title" style={{ color: '#20241F' }}>{spec.name}</h3>
                       <a
                         href={spec.url}
                         target="_blank"
                         rel="noreferrer"
-                        className="btn-text text-small"
+                        className="btn-text text-small shrink-0 mt-0.5"
                         style={{ fontSize: '0.8125rem' }}
                       >
                         Division page <ExternalLink size={12} />
                       </a>
                     </div>
-                    <h3 className="text-card-title mb-2" style={{ color: '#20241F' }}>{spec.name}</h3>
                     <p className="text-small leading-relaxed mb-4" style={{ color: '#5A5F59' }}>
                       {spec.description}
                     </p>
