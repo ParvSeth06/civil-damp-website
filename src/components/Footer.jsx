@@ -11,16 +11,16 @@ const navCols = [
   {
     heading: 'Academics',
     links: [
-      { label: 'Curriculum & Structure', path: '/academics?tab=0' },
+      { label: 'Course Reviews', path: '/academics?tab=0' },
       { label: 'Specializations & Labs', path: '/academics?tab=1' },
-      { label: 'Course Reviews', path: '/academics?tab=2' },
+      { label: 'Academic Resources & PYQs', path: '/academics?tab=2' },
     ],
   },
   {
     heading: 'Experiences',
     links: [
       { label: 'Internship Stories', path: '/opportunities?tab=0' },
-      { label: 'Research Profiles', path: '/opportunities?tab=1' },
+      { label: 'Research & Projects (BTP/IDP)', path: '/opportunities?tab=1' },
       { label: 'Competitions', path: '/opportunities?tab=2' },
     ],
   },

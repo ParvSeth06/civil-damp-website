@@ -14,7 +14,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { MapPin, Clock, X, ChevronRight, ExternalLink, Mail, Award, CheckCircle2 } from 'lucide-react'
+import { MapPin, Clock, X, ChevronRight, ExternalLink, Mail, Award, CheckCircle2, BookOpen, Sparkles, User } from 'lucide-react'
 import { internships, competitions, professors, projects } from '../data/dummy'
 
 const TABS = ['Internship Stories', 'Research Profiles', 'Competitions']
@@ -50,7 +50,13 @@ function Modal({ item, type, onClose }) {
     >
       <div
         className="rounded-3xl w-full shadow-2xl relative"
-        style={{ maxWidth: 540, background: '#FFFFFF', border: '1px solid #DDD9CC', maxHeight: '85vh', overflowY: 'auto' }}
+        style={{
+          maxWidth: type === 'project' ? 740 : 540,
+          background: '#FFFFFF',
+          border: '1px solid #DDD9CC',
+          maxHeight: '90vh',
+          overflowY: 'auto'
+        }}
         onClick={e => e.stopPropagation()}
       >
         <button
@@ -144,16 +150,163 @@ function Modal({ item, type, onClose }) {
 
           {type === 'project' && (
             <>
-              <h2 className="font-bold text-xl mb-2" style={{ color: '#20241F', paddingRight: '2rem', lineHeight: 1.3 }}>
+              <div className="flex items-center gap-2 mb-3 flex-wrap">
+                <span
+                  className="inline-block text-meta font-bold px-2.5 py-1 rounded-full font-mono"
+                  style={{
+                    background: item.type === 'BTP' ? 'rgba(23,63,53,0.1)' : 'rgba(124,58,237,0.1)',
+                    color: item.type === 'BTP' ? '#173F35' : '#6d28d9',
+                  }}
+                >
+                  {item.type === 'BTP' ? 'BTP · Bachelor Thesis' : 'IDP · Interdisciplinary Project'}
+                </span>
+                {item.domain && (
+                  <span
+                    className="inline-block text-meta font-semibold px-2.5 py-1 rounded-full"
+                    style={{ background: '#F0EDE3', color: '#5A5F59' }}
+                  >
+                    {item.domain}
+                  </span>
+                )}
+                {item.semester && (
+                  <span
+                    className="inline-block text-meta font-medium px-2 py-0.5 rounded-md"
+                    style={{ background: '#F7F5EE', color: '#8A8F88' }}
+                  >
+                    {item.semester}
+                  </span>
+                )}
+              </div>
+
+              <h2 className="font-bold text-2xl mb-1.5" style={{ color: '#20241F', paddingRight: '2rem', lineHeight: 1.25 }}>
                 {item.title}
               </h2>
-              <p className="text-small font-bold mb-1" style={{ color: '#20241F' }}>{item.student}</p>
-              <p className="text-small mb-5" style={{ color: '#8A8F88' }}>Advisor: {item.professor} · {item.year}</p>
+
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-small mb-3" style={{ color: '#5A5F59' }}>
+                <span>Student: <strong>{item.student}</strong></span>
+                <span>·</span>
+                <span>Guide: <strong>{item.professor}</strong> {item.teamSize ? `(${item.teamSize})` : ''}</span>
+              </div>
+
+              {/* Senior attribution */}
               <div
-                className="rounded-2xl p-4"
-                style={{ background: '#F7F5EE', border: '1px solid #E8E5DC' }}
+                className="mb-4 inline-flex flex-wrap items-center gap-2 px-3 py-1.5 rounded-xl text-meta"
+                style={{ background: '#F7F5EE', border: '1px solid #E8E5DC', color: '#5A5F59' }}
               >
-                <p className="text-small leading-relaxed" style={{ color: '#5A5F59' }}>{item.description}</p>
+                <span className="font-semibold flex items-center gap-1.5" style={{ color: '#20241F' }}>
+                  <User size={13} style={{ color: '#173F35' }} />
+                  Senior Interviewee: <strong>{item.student}</strong>
+                </span>
+                {item.reviewer && (
+                  <span style={{ color: '#8A8F88' }}>
+                    · DAMP Interviewer: {item.reviewer}
+                  </span>
+                )}
+                {item.metrics && item.metrics['Date of call'] && (
+                  <span style={{ color: '#8A8F88' }}>
+                    · Call Date: {item.metrics['Date of call']}
+                  </span>
+                )}
+              </div>
+
+              {/* Inherited Highlights / Scope */}
+              {item.description && (
+                <div
+                  className="rounded-2xl p-4 mb-4"
+                  style={{ background: 'rgba(23,63,53,0.05)', border: '1px solid rgba(23,63,53,0.12)' }}
+                >
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <Sparkles size={15} style={{ color: '#173F35' }} />
+                    <span className="text-meta font-bold uppercase tracking-wider" style={{ color: '#173F35' }}>
+                      Scope & Problem Statement Overview
+                    </span>
+                  </div>
+                  <p className="text-small leading-relaxed" style={{ color: '#3A3F38' }}>
+                    {item.description}
+                  </p>
+                </div>
+              )}
+
+              {/* Metrics summary banner if available */}
+              {item.metrics && Object.keys(item.metrics).length > 0 && (
+                <div
+                  className="rounded-2xl p-4 mb-4"
+                  style={{ background: '#FFFFFF', border: '1px solid #DDD9CC' }}
+                >
+                  <p className="text-meta font-bold uppercase tracking-wider mb-2.5" style={{ color: '#8A8F88' }}>
+                    Project Parameters & Ratings
+                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-small">
+                    {Object.entries(item.metrics).map(([k, v]) => (
+                      <div key={k} className="p-2.5 rounded-xl bg-[#F7F5EE] border border-[#DDD9CC]/70">
+                        <span className="text-meta block font-medium" style={{ color: '#8A8F88' }}>{k}</span>
+                        <span className="font-bold text-sm" style={{ color: '#173F35' }}>{v}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Complete Senior Review (As Submitted) */}
+              <div className="mt-5 pt-4 border-t border-[#E8E5DC]">
+                <div className="flex items-center justify-between gap-3 mb-3 pb-2 border-b border-[#E8E5DC]">
+                  <span className="text-meta font-bold uppercase tracking-wider" style={{ color: '#173F35' }}>
+                    Complete Senior Review (As Submitted)
+                  </span>
+                  <span className="text-meta text-[#8A8F88] font-mono">
+                    Official DAMP Record
+                  </span>
+                </div>
+
+                {item.verbatimSections && item.verbatimSections.length > 0 ? (
+                  <div className="space-y-4">
+                    {item.verbatimSections.map((sec, sIdx) => (
+                      <div
+                        key={sIdx}
+                        className="rounded-2xl p-4.5 bg-[#FDFCF9] border border-[#DDD9CC]"
+                      >
+                        <h4
+                          className="font-bold text-sm uppercase tracking-wider mb-2.5 text-[#173F35] flex items-center gap-2"
+                        >
+                          <BookOpen size={14} className="text-[#173F35]" />
+                          {sec.heading}
+                        </h4>
+                        <div className="space-y-2">
+                          {sec.lines.map((line, lIdx) => {
+                            const isQuestion = /^\d+\./.test(line.trim()) || (line.trim().endsWith('?') && line.length < 130)
+                            const isNote = line.startsWith('•') || line.startsWith('⚠') || line.startsWith('Rate')
+                            return isQuestion ? (
+                              <p
+                                key={lIdx}
+                                className="font-bold text-sm text-[#173F35] mt-3 pt-2 first:mt-0 first:pt-0 border-t border-[#F0EDE3] first:border-0"
+                              >
+                                {line}
+                              </p>
+                            ) : isNote ? (
+                              <p
+                                key={lIdx}
+                                className="text-meta text-[#855e09] bg-amber-500/10 px-2.5 py-1 rounded-md"
+                              >
+                                {line}
+                              </p>
+                            ) : (
+                              <p
+                                key={lIdx}
+                                className="text-small text-[#3A3F38] leading-relaxed"
+                              >
+                                {line}
+                              </p>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <pre className="whitespace-pre-wrap font-sans text-small p-4 bg-[#FDFCF9] rounded-2xl border border-[#DDD9CC] text-[#3A3F38] leading-relaxed">
+                    {item.rawContent || item.description}
+                  </pre>
+                )}
               </div>
             </>
           )}
@@ -178,6 +331,7 @@ export default function Opportunities() {
   const [activeTab, setActiveTab] = useState(tabParam)
   const [catFilter, setCatFilter] = useState('All')
   const [deptFilter, setDeptFilter] = useState('All')
+  const [projFilter, setProjFilter] = useState('All')
   const [modal, setModal] = useState({ item: null, type: null })
 
   useEffect(() => { setActiveTab(tabParam) }, [tabParam])
@@ -187,7 +341,13 @@ export default function Opportunities() {
     setSearchParams({ tab: i }, { replace: true })
     setCatFilter('All')
     setDeptFilter('All')
+    setProjFilter('All')
   }, [setSearchParams])
+
+  const filteredProjects = projects.filter(p => {
+    if (projFilter === 'All') return true
+    return p.type === projFilter
+  })
 
   // Filter internships supporting both primary categories and non-core subtags
   const filteredInternships = internships.filter(i => {
@@ -442,26 +602,97 @@ export default function Opportunities() {
 
             {/* BTP / IDP Projects */}
             <div className="mt-14">
-              <h2 className="text-section mb-2" style={{ color: '#20241F' }}>Recent BTP & IDP Projects</h2>
-              <p className="text-body mb-6" style={{ color: '#5A5F59' }}>
-                Examples of undergraduate research and capstone projects carried out in the department.
-              </p>
+              <div className="flex flex-wrap items-center justify-between gap-4 mb-3">
+                <div>
+                  <h2 className="text-section" style={{ color: '#20241F' }}>
+                    BTP & IDP Senior Project Reviews
+                  </h2>
+                  <p className="text-body mt-1" style={{ color: '#5A5F59' }}>
+                    Authentic project reviews, deliverables, and guide insights from students who completed Bachelor Thesis Projects (BTP) and Institute Development Projects (IDP).
+                  </p>
+                </div>
+              </div>
+
+              {/* Filter pills */}
+              <div className="flex flex-wrap gap-2 mb-6">
+                {[
+                  { label: `All Projects (${projects.length})`, val: 'All' },
+                  { label: 'BTP Projects (3)', val: 'BTP' },
+                  { label: 'IDP Projects (7)', val: 'IDP' },
+                ].map(tab => (
+                  <button
+                    key={tab.val}
+                    onClick={() => setProjFilter(tab.val)}
+                    className={`text-small font-semibold px-3 py-1.5 rounded-full transition-all ${
+                      projFilter === tab.val ? 'shadow-xs' : 'hover:bg-neutral-200/50'
+                    }`}
+                    style={{
+                      background: projFilter === tab.val ? '#173F35' : '#FFFFFF',
+                      color: projFilter === tab.val ? '#F7F5EE' : '#5A5F59',
+                      border: '1px solid',
+                      borderColor: projFilter === tab.val ? '#173F35' : '#DDD9CC',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {projects.map(p => (
+                {filteredProjects.map(p => (
                   <button
                     key={p.id}
-                    className="text-left rounded-2xl p-6 hover-lift"
+                    className="text-left rounded-2xl p-6 hover-lift flex flex-col justify-between"
                     style={{ background: '#FFFFFF', border: '1px solid #DDD9CC', cursor: 'pointer' }}
                     onClick={() => setModal({ item: p, type: 'project' })}
-                    aria-label={`Read project abstract: ${p.title}`}
+                    aria-label={`Read project review: ${p.title}`}
                   >
-                    <h3 className="text-card-title mb-1.5" style={{ color: '#20241F', lineHeight: 1.35 }}>{p.title}</h3>
-                    <p className="text-small font-semibold mb-1" style={{ color: '#20241F' }}>{p.student}</p>
-                    <p className="text-small mb-3" style={{ color: '#8A8F88' }}>Advisor: {p.professor} · {p.year}</p>
-                    <p className="text-small leading-relaxed line-clamp-2" style={{ color: '#5A5F59' }}>{p.description}</p>
-                    <span className="btn-text mt-4 text-small" style={{ color: '#173F35', fontSize: '0.875rem' }}>
-                      Read abstract <ChevronRight size={13} />
-                    </span>
+                    <div>
+                      <div className="flex items-center gap-2 mb-2.5 flex-wrap">
+                        <span
+                          className="text-meta font-bold px-2.5 py-0.5 rounded-full font-mono"
+                          style={{
+                            background: p.type === 'BTP' ? 'rgba(23,63,53,0.1)' : 'rgba(124,58,237,0.1)',
+                            color: p.type === 'BTP' ? '#173F35' : '#6d28d9',
+                          }}
+                        >
+                          {p.type}
+                        </span>
+                        {p.domain && (
+                          <span
+                            className="text-meta font-medium px-2 py-0.5 rounded-full"
+                            style={{ background: '#F0EDE3', color: '#5A5F59' }}
+                          >
+                            {p.domain}
+                          </span>
+                        )}
+                        {p.semester && (
+                          <span className="text-meta px-2 py-0.5 rounded bg-[#F7F5EE] text-[#8A8F88]">
+                            {p.semester}
+                          </span>
+                        )}
+                      </div>
+
+                      <h3 className="text-card-title mb-1.5" style={{ color: '#20241F', lineHeight: 1.35 }}>
+                        {p.title}
+                      </h3>
+                      <p className="text-small font-semibold mb-1" style={{ color: '#20241F' }}>
+                        {p.student}
+                      </p>
+                      <p className="text-meta mb-3" style={{ color: '#8A8F88' }}>
+                        Guide: <strong>{p.professor}</strong> {p.teamSize ? `· ${p.teamSize}` : ''}
+                      </p>
+                      <p className="text-small leading-relaxed line-clamp-3" style={{ color: '#5A5F59' }}>
+                        {p.description}
+                      </p>
+                    </div>
+
+                    <div className="mt-4 pt-3 border-t border-[#F0EDE3] flex items-center justify-between">
+                      <span className="btn-text text-small" style={{ color: '#173F35', fontSize: '0.875rem' }}>
+                        Read Senior Review & Advice <ChevronRight size={13} />
+                      </span>
+                    </div>
                   </button>
                 ))}
               </div>

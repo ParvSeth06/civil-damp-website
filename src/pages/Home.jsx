@@ -10,20 +10,20 @@
  */
 
 import { Link } from 'react-router-dom'
-import { ArrowRight, BookOpen, Briefcase, FlaskConical, Users, Mail } from 'lucide-react'
-import { blogs, dampc } from '../data/dummy'
+import { ArrowRight, BookOpen, Briefcase, FlaskConical, Users, Mail, FileText } from 'lucide-react'
+import { blogs, dampc, courseReviews } from '../data/dummy'
 import CampusFieldbook from '../components/CampusFieldbook'
 
-// Derive count from real records — no hard-coded marketing numbers
-const REVIEW_COUNT = 8  // from courseReviews array length
-const SPEC_COUNT   = 7  // from specializations array
+// Derive count dynamically from real records
+const REVIEW_COUNT = courseReviews.length
+const SPEC_COUNT   = 7
 
 const actions = [
   {
     icon: BookOpen,
     label: 'Course Reviews',
-    desc: `${REVIEW_COUNT} student-written reviews across core and elective CE courses — what to expect, grading insights, and tips from seniors.`,
-    path: '/academics?tab=2',
+    desc: `${REVIEW_COUNT} student-written reviews across civil engineering electives — what to expect, grading insights, and tips from seniors.`,
+    path: '/academics?tab=0',
     cta: 'Read reviews',
     variant: 'forest',
   },
@@ -44,11 +44,11 @@ const actions = [
     variant: 'outline',
   },
   {
-    icon: Users,
-    label: 'Curriculum & Structure',
-    desc: 'B.Tech civil engineering curriculum layout, semester-wise credit distribution, and departmental electives.',
-    path: '/academics?tab=0',
-    cta: 'View curriculum',
+    icon: FileText,
+    label: 'Academic Resources & PYQs',
+    desc: 'Department question paper archives, midsem/endsem papers, and verified study material directly from seniors.',
+    path: '/academics?tab=2',
+    cta: 'Browse resources',
     variant: 'outline',
   },
 ]

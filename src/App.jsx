@@ -5,6 +5,7 @@ import ScrollToTopButton from './components/ScrollToTopButton'
 import ErrorBoundary from './components/ErrorBoundary'
 import Home from './pages/Home'
 import Academics from './pages/Academics'
+import CourseReviewPage from './pages/CourseReviewPage'
 import Opportunities from './pages/Opportunities'
 import Team from './pages/Team'
 import BlogDetail from './pages/BlogDetail'
@@ -24,6 +25,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/academics" element={<Academics />} />
+              <Route path="/academics/review/:id" element={<CourseReviewPage />} />
               <Route path="/opportunities" element={<Opportunities />} />
               <Route path="/team" element={<Team />} />
               <Route path="/blogs/:id" element={<BlogDetail />} />

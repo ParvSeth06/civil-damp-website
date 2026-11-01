@@ -19,7 +19,7 @@ const DESTINATIONS = [
     id: 'courses',
     label: 'Courses',
     subLabel: 'Reviews & guides',
-    path: '/academics?tab=2',
+    path: '/academics?tab=0',
     icon: BookOpen,
     nodeX: 135,
     nodeY: 105,
